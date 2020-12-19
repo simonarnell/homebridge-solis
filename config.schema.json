@@ -1,0 +1,37 @@
+{
+  "pluginAlias": "Solis PV Inverter Homebridge Plugin",
+  "pluginType": "accessory",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "required": true,
+        "default": "Solis PV Inverter"
+      },
+      "username": {
+        "title": "Username",
+        "type": "string",
+        "required": true
+      },
+      "password": {
+        "title": "Password",
+        "type": "string",
+        "required": true
+      },
+      "hostname": {
+        "title": "Hostname",
+        "type": "string",
+        "required": true,
+        "format": "hostname"
+      },
+      "interval": {
+        "title": "Update interval (s)",
+        "type": "integer",
+        "minimum": 30
+      }
+    }
+  }
+}
