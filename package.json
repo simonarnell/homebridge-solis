@@ -1,6 +1,6 @@
 {
   "name": "homebridge-solis",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A homebridge plugin that collects solar panel generation data from Solis PV inverters and publishes to the HomeKit system.",
   "main": "dist/accessory.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "homebridge": ">=1.0.0"
   },
   "dependencies": {
-    "solis-inverter": "git@github.com:fss/solis-inverter.git"
+    "solis-inverter": "fss/solis-inverter.git"
   },
   "devDependencies": {
     "@types/node": "^14.14.6",
@@ -34,10 +34,7 @@
     "LICENSE",
     "dist"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/simonarnell/homebridge-solis.git"
-  },
+  "repository": "github:simonarnell/homebridge-solis",
   "keywords": [
     "homebridge-plugin",
     "solis",
