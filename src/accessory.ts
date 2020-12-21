@@ -10,12 +10,11 @@ import {
   Perms,
   Service,
   Units} from "homebridge";
+import SolisInverterClient = require('solis-inverter/lib/solis_inverter_client');
+import { InverterDataFrame } from "./types/inverterDataFrame";
 
 let hap: HAP;
-
-const SolisInverterClient: any = require('solis-inverter/lib/solis_inverter_client');
-
-export = (api: API) => {
+export = (api: API): void => {
   hap = api.hap;
   api.registerAccessory("Solis PV Inverter Homebridge Plugin", SolisInverter);
 };
@@ -28,7 +27,7 @@ class SolisInverter implements AccessoryPlugin {
   private readonly username: string
   private readonly password: string;
   private readonly interval: number;
-  private readonly solisInverterClient: any;
+  private readonly solisInverterClient: SolisInverterClient;
 
   private generatedToday: number;
   private currentlyGenerating: number;
@@ -86,14 +85,52 @@ class SolisInverter implements AccessoryPlugin {
     ];
   }
 
-  fetchData(): any {
-    this.solisInverterClient.fetchData()
-      .then((data: any) => {
+  async fetchData(): Promise<InverterDataFrame> {
+    try {
+      return await this.solisInverterClient.fetchData()
+      .then((data: InverterDataFrame) => {
+        this.log.debug(JSON.stringify(data))
         if (data.inverter.serial) {
           this.generatedToday = data.energy.today;
           this.currentlyGenerating = data.power
         }
       })
-      .catch((err: any) => this.log.error(JSON.stringify(err)));
+      .catch((err: unknown) => this.log.error(JSON.stringify(err)));
+    } catch {
+      return {
+        lastSeen: 0,
+        inverter: {
+          model: "",
+          serial: "",
+          firmwareMain: "",
+          firmwareSlave: ""
+        },
+        logger: {
+          serial: "",
+          version: "",
+          mode: "",
+          ap: {
+            ssid: "",
+            ip: "",
+            mac: ""
+          },
+          sta: {
+            ssid: "",
+            ip: "",
+            mac: "",
+            rssi: ""
+          }
+        },
+        remoteServer: {
+          a: false,
+          b: false
+        },
+        power: 0,
+        energy: {
+          today: 0,
+          total: 0
+        }
+      }
     }
+  }
 }
