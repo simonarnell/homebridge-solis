@@ -29,6 +29,8 @@ class SolisInverter implements AccessoryPlugin {
   private readonly interval: number;
   private readonly solisInverterClient: SolisInverterClient;
 
+  private on: boolean;
+  private generating: boolean;
   private generatedToday: number;
   private currentlyGenerating: number;
 
@@ -38,6 +40,8 @@ class SolisInverter implements AccessoryPlugin {
   constructor(log: Logging, config: AccessoryConfig) {
     this.log = log;
     this.name = config.name;
+    this.on = false;
+    this.generating = false;
     this.generatedToday = 0
     this.currentlyGenerating = 0;
 
@@ -50,6 +54,16 @@ class SolisInverter implements AccessoryPlugin {
     this.fetchData().then(() => setInterval(this.fetchData, this.interval * 1000))
 
     this.inverterService = new hap.Service(this.name, hap.Service.Outlet.UUID,)
+    this.inverterService.addCharacteristic(hap.Characteristic.On)
+      .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
+        log.info(`Inverter State: ${this.on ? "On" : "Off"}`)
+        callback(undefined, this.on ? 1 : 0)
+      })
+    this.inverterService.addCharacteristic(hap.Characteristic.OutletInUse)
+    .on(CharacteristicEventTypes.GET, (callback: CharacteristicGetCallback) => {
+      log.info(`Inverter In Use (generating): ${this.generating ? "Yes" : "No"}`)
+      callback(undefined, this.generating ? 1 : 0)
+    })
     this.inverterService.addCharacteristic(
       new hap.Characteristic("Current Generation", "E863F10D-079E-48FF-8F27-9C2605A29F52",
       { format: Formats.UINT16,
@@ -86,13 +100,18 @@ class SolisInverter implements AccessoryPlugin {
   }
 
   async fetchData(): Promise<InverterDataFrame> {
+    this.generating = false;
+    this.on = false;
     try {
       return await this.solisInverterClient.fetchData()
       .then((data: InverterDataFrame) => {
         this.log.debug(JSON.stringify(data))
         if (data.inverter.serial) {
+          this.on = true
           this.generatedToday = data.energy.today;
           this.currentlyGenerating = data.power
+          if(data.power > 0)
+            this.generating = true;
         }
       })
       .catch((err: unknown) => this.log.error(JSON.stringify(err)));
