@@ -3,32 +3,35 @@
   "pluginType": "accessory",
   "singular": false,
   "schema": {
-    "name": {
-      "title": "Name",
-      "type": "string",
-      "required": true,
-      "default": "Solis PV Inverter"
-    },
-    "username": {
-      "title": "Username",
-      "type": "string",
-      "required": true
-    },
-    "password": {
-      "title": "Password",
-      "type": "string",
-      "required": true
-    },
-    "hostname": {
-      "title": "Hostname",
-      "type": "string",
-      "required": true,
-      "format": "hostname"
-    },
-    "interval": {
-      "title": "Update interval (s)",
-      "type": "integer",
-      "minimum": 30
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "required": true,
+        "default": "Solis PV Inverter - Loft"
+      },
+      "username": {
+        "title": "Username",
+        "type": "string",
+        "required": true
+      },
+      "password": {
+        "title": "Password",
+        "type": "string",
+        "required": true
+      },
+      "hostname": {
+        "title": "Hostname",
+        "type": "string",
+        "required": true,
+        "format": "hostname"
+      },
+      "interval": {
+        "title": "Update interval (s)",
+        "type": "integer",
+        "minimum": 30
+      }
     }
   }
 }
