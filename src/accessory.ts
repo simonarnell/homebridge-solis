@@ -45,7 +45,7 @@ class SolisInverter implements AccessoryPlugin {
     this.generatedToday = 0
     this.currentlyGenerating = 0;
 
-    this.interval = <number>config.interval;
+    this.interval = isNaN(parseInt(<string>config.interval)) || parseInt(<string>config.interval) < 30 ? 30 : parseInt(<string>config.interval);
     this.address = <string>config.hostname;
     this.username = <string>config.username;
     this.password = <string>config.password;
