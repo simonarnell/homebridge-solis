@@ -50,8 +50,8 @@ class SolisInverter implements AccessoryPlugin {
     this.username = <string>config.username;
     this.password = <string>config.password;
     this.solisInverterClient = new SolisInverterClient(this.address, this.username, this.password)
-
-    this.fetchData().then(() => setInterval(this.fetchData, this.interval * 1000))
+    
+    setInterval(this.fetchData.bind(this), this.interval * 1000)
 
     this.inverterService = new hap.Service(this.name, hap.Service.Outlet.UUID,)
     this.inverterService.addCharacteristic(hap.Characteristic.On)
@@ -99,58 +99,23 @@ class SolisInverter implements AccessoryPlugin {
     ];
   }
 
-  async fetchData(): Promise<InverterDataFrame> {
+  fetchData(): void {
     this.generating = false;
     this.on = false;
     this.currentlyGenerating = 0;
-    try {
-      return await this.solisInverterClient.fetchData()
-      .then((data: InverterDataFrame) => {
-        this.log.debug(JSON.stringify(data))
-        if (data.inverter.serial) {
-          this.on = true
-          this.generatedToday = data.energy.today;
-          this.currentlyGenerating = data.power
-          if(data.power > 0)
-            this.generating = true;
-        }
-      })
-      .catch((err: unknown) => this.log.error(JSON.stringify(err)));
-    } catch {
-      return {
-        lastSeen: 0,
-        inverter: {
-          model: "",
-          serial: "",
-          firmwareMain: "",
-          firmwareSlave: ""
-        },
-        logger: {
-          serial: "",
-          version: "",
-          mode: "",
-          ap: {
-            ssid: "",
-            ip: "",
-            mac: ""
-          },
-          sta: {
-            ssid: "",
-            ip: "",
-            mac: "",
-            rssi: ""
-          }
-        },
-        remoteServer: {
-          a: false,
-          b: false
-        },
-        power: 0,
-        energy: {
-          today: 0,
-          total: 0
-        }
+    this.solisInverterClient.fetchData()
+    .then((data: InverterDataFrame) => {
+      this.log.debug(JSON.stringify(data))
+      if (data.inverter.serial) {
+        this.on = true
+        this.generatedToday = data.energy.today;
+        this.currentlyGenerating = data.power
+        if(data.power > 0)
+          this.generating = true;
       }
-    }
+    })
+    .catch((err: unknown) => {
+      this.log.error(JSON.stringify(err));
+    })
   }
 }
