@@ -52,7 +52,7 @@ class SolisInverter implements AccessoryPlugin {
     this.solisInverterClient = new SolisInverterClient(this.address, this.username, this.password)
     
     setInterval(this.fetchData.bind(this), this.interval * 1000)
-    setInterval(function midnightReset() { 
+    setInterval(function midnightReset(this: SolisInverter) { 
       this.generatedToday = 0
       setInterval(midnightReset, new Date(new Date().setDate(new Date().getDate()+1)).setHours(0,0,0,0).valueOf() - new Date().valueOf())
     }, new Date(new Date().setDate(new Date().getDate()+1)).setHours(0,0,0,0).valueOf() - new Date().valueOf())
