@@ -102,6 +102,7 @@ class SolisInverter implements AccessoryPlugin {
   async fetchData(): Promise<InverterDataFrame> {
     this.generating = false;
     this.on = false;
+    this.currentlyGenerating = 0;
     try {
       return await this.solisInverterClient.fetchData()
       .then((data: InverterDataFrame) => {
