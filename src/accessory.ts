@@ -120,7 +120,7 @@ class SolisInverter implements AccessoryPlugin {
       }
     })
     .catch((err: AxiosError) => {
-      this.log.warn(JSON.stringify(err));
+      this.log.warn(`Error communicating with inverter - ${err.code}`);
     })
   }
 }
