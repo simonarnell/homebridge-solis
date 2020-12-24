@@ -11,6 +11,7 @@ import {
   Service,
   Units} from "homebridge";
 import SolisInverterClient = require('solis-inverter/lib/solis_inverter_client');
+import type { AxiosError } from "axios"
 import { InverterDataFrame } from "./types/inverterDataFrame";
 
 let hap: HAP;
@@ -104,9 +105,6 @@ class SolisInverter implements AccessoryPlugin {
   }
 
   fetchData(): void {
-    this.generating = false;
-    this.on = false;
-    this.currentlyGenerating = 0;
     this.solisInverterClient.fetchData()
     .then((data: InverterDataFrame) => {
       this.log.debug(JSON.stringify(data))
@@ -114,12 +112,14 @@ class SolisInverter implements AccessoryPlugin {
         this.on = true
         this.generatedToday = data.energy.today;
         this.currentlyGenerating = data.power
-        if(data.power > 0)
-          this.generating = true;
+        this.generating = data.power > 0
       }
     })
-    .catch((err: unknown) => {
-      this.log.error(JSON.stringify(err));
+    .catch((err: AxiosError) => {
+      this.log.warn(`Error communicating with inverter - ${err.code}`);
+      this.on = false;
+      this.generating = false;
+      this.currentlyGenerating = 0;
     })
   }
 }
