@@ -119,7 +119,7 @@ class SolisInverter implements AccessoryPlugin {
       }
     })
     .catch((err: unknown) => {
-      this.log.error(JSON.stringify(err));
+      this.log.warn(JSON.stringify(err));
     })
   }
 }
